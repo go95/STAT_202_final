@@ -28,7 +28,7 @@ class SeperateModels(BaseEstimator, RegressorMixin):
     """
     A model, which combines two models for Period 1 and Period 2
     """
-    def __init__(self, estimator1, estimator2):
+    def __init__(self, estimator1, estimator2, midpoint):
         self.estimator1 = estimator1
         self.estimator2 = estimator2
         self.midpoint = midpoint
@@ -39,16 +39,13 @@ class SeperateModels(BaseEstimator, RegressorMixin):
         return self
 
     def predict(self, X):
-        begin = begin_model.predict(X)
-        end = end_model.predict(X)
+        begin = self.estimator1.predict(X)
+        end = self.estimator2.predict(X)
 
         result = begin
         result[self.midpoint:] = end[self.midpoint:]
         return result
 
-
-# +
-from window_generator import WindowGenerator
 
 class LastValueModel(BaseEstimator, RegressorMixin):
     """
@@ -64,8 +61,6 @@ class LastValueModel(BaseEstimator, RegressorMixin):
     def predict(self, X):
         return np.repeat(self.predictions[np.newaxis, :], len(X), axis=0)
 
-
-# -
 
 class LastDayModel(BaseEstimator, RegressorMixin):
     """

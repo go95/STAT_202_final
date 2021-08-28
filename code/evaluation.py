@@ -1,6 +1,9 @@
 from sklearn.model_selection import cross_validate, TimeSeriesSplit
 from sklearn.metrics import make_scorer
 from evaluation_utils import Evaluator
+import numpy as np
+import pandas as pd
+from constants import *
 
 class Validator(object):
     """
@@ -12,8 +15,8 @@ class Validator(object):
         self.splits = splits
         endog_mask = ~data.columns.isin([('day', ''), ('time', ''), ('morning', '')])
         exog_mask = data.columns.isin([('day', ''), ('time', ''), ('morning', '')])
-        self.y = pv.iloc[:, endog_mask].to_numpy()
-        self.X = pv.iloc[:, exog_mask].to_numpy()
+        self.y = data.iloc[:, endog_mask].to_numpy()
+        self.X = data.iloc[:, exog_mask].to_numpy()
         time = np.tile(data['time'][:TIMESTEPS_A_DAY], evaluation_size)
         self.X_predict = np.column_stack([
             np.repeat(np.arange(np.max(self.X[:,0]) + 1, np.max(self.X[:,0]) + evaluation_size + 1), TIMESTEPS_A_DAY),
